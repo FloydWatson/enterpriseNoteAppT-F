@@ -14,7 +14,7 @@ import (
 
 func connectDatabase() (db *sql.DB) {
 	//Open db connection
-	db, err := sql.Open("postgres", "user=postgres password=password dbname=noteBookApp sslmode=disable")
+	db, err := sql.Open("postgres", "user=postgres password=password dbname=noteDB sslmode=disable")
 
 	if err != nil {
 		log.Panic(err)
@@ -52,11 +52,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 			http.SetCookie(w, usernameCookie)  // set user name cookie
 			fmt.Fprint(w, "Login Successfull") // print for correct login details
 		} else {
-			fmt.Fprint(w, "Login Unsuccessfull") // print for incorrect login details
+			fmt.Fprint(w, "Login Unsuccessfull. bad pass") // print for incorrect login details
 		}
 
 	} else {
-		fmt.Fprint(w, "Login Unsuccessfull") // print for incorrect login details
+		fmt.Fprint(w, "Login Unsuccessfull, bad username") // print for incorrect login details
 	}
 
 }
