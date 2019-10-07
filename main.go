@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -28,6 +29,8 @@ func main() {
 
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/login", login).Methods("GET")
+
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 // LOGIN
@@ -36,6 +39,24 @@ func login(w http.ResponseWriter, r *http.Request) {
 	var userLogin User
 	req, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(req, &userLogin)
+
+	if checkUsername(userLogin.UserName) {
+		if checkPassword(userLogin.Password) {
+
+			usernameCookie := &http.Cookie{ // create a username cookie
+				Name:  "username",         // cookie name
+				Value: userLogin.UserName, // stored username
+			}
+
+			http.SetCookie(w, usernameCookie)  // set user name cookie
+			fmt.Fprint(w, "Login Successfull") // print for correct login details
+		} else {
+			fmt.Fprint(w, "Login Unsuccessfull") // print for incorrect login details
+		}
+
+	} else {
+		fmt.Fprint(w, "Login Unsuccessfull") // print for incorrect login details
+	}
 
 }
 
@@ -63,7 +84,7 @@ func checkUsername(username string) bool {
 }
 
 // LOGIN FUNC CHECK PASSWORD
-func validatePass(password string) bool {
+func checkPassword(password string) bool {
 	var pass string
 
 	db := connectDatabase() // db connection
