@@ -24,8 +24,6 @@ func connectDatabase() (db *sql.DB) {
 }
 
 func main() {
-	db := connectDatabase()
-	defer db.Close()
 
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/login", login).Methods("GET")
@@ -35,6 +33,9 @@ func main() {
 
 // LOGIN
 func login(w http.ResponseWriter, r *http.Request) {
+
+	db := connectDatabase()
+	defer db.Close()
 
 	var userLogin User
 	req, _ := ioutil.ReadAll(r.Body)
