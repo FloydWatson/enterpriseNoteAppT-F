@@ -42,18 +42,14 @@ func login(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(req, &userLogin)
 
 	if checkUsername(userLogin.UserName) {
-		if checkPassword(userLogin.Password) {
 
-			usernameCookie := &http.Cookie{ // create a username cookie
-				Name:  "username",         // cookie name
-				Value: userLogin.UserName, // stored username
-			}
-
-			http.SetCookie(w, usernameCookie)  // set user name cookie
-			fmt.Fprint(w, "Login Successfull") // print for correct login details
-		} else {
-			fmt.Fprint(w, "Login Unsuccessfull. bad pass") // print for incorrect login details
+		usernameCookie := &http.Cookie{ // create a username cookie
+			Name:  "username",         // cookie name
+			Value: userLogin.UserName, // stored username
 		}
+
+		http.SetCookie(w, usernameCookie)  // set user name cookie
+		fmt.Fprint(w, "Login Successfull") // print for correct login details
 
 	} else {
 		fmt.Fprint(w, "Login Unsuccessfull, bad username") // print for incorrect login details
@@ -82,31 +78,6 @@ func checkUsername(username string) bool {
 	}
 
 	return true // return true if user name exists
-}
-
-// LOGIN FUNC CHECK PASSWORD
-func checkPassword(password string) bool {
-	var pass string
-
-	db := connectDatabase() // db connection
-	defer db.Close()        // close db connection after use
-
-	stmt, err := db.Prepare("SELECT password FROM _user WHERE password = $1;") // sql query sent to db $1 is the password
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = stmt.QueryRow(password).Scan(&pass) // sending query to db
-
-	if err == sql.ErrNoRows {
-		return false // return false if not found
-	}
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return true // return true if correct
-
 }
 
 // MODEL USER
